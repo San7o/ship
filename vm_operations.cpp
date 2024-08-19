@@ -1,4 +1,6 @@
 #include "ship.h"
+#include <chrono>
+#include <thread>
 
 void pass_password_to_tmux() {
     string capture_tmux_last_line_cmd = "tmux capture-pane -p -S -1 -t " + ship_env.name + " | tail -n 1";
@@ -149,6 +151,9 @@ void save_vm() {
 void shutdown_vm() {
     string shutdown_cmd = "sudo virsh shutdown " + ship_env.name; 
     system(shutdown_cmd.c_str()); 
+
+    /* Wait some time for the VM to shutdown */
+    std::this_thread::sleep_for(std::chrono::seconds(5));
     string state = get_vm_state(ship_env.name);
 
     if (state.find("running") != string::npos || state.find("paused") != string::npos) {
